@@ -446,8 +446,8 @@ button {
   }
 
   .toml-output {
-    min-height: 0;
-    height: 100%;
+    min-height: 420px;
+    height: auto;
     padding: 14px;
     font-size: 12px;
     line-height: 1.6;
@@ -455,13 +455,17 @@ button {
 
   .form-panel,
   .preview-panel {
-    height: min(90dvh, 1040px);
-    min-height: 680px;
-    overflow: hidden;
+    height: auto;
+    min-height: 0;
+    overflow: visible;
   }
 
   .panel-scroll {
+    flex: initial;
+    min-height: 0;
+    overflow: visible;
     padding-right: 0;
+    overscroll-behavior: auto;
   }
 
   .form-root {
