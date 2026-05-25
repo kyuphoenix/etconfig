@@ -1,6 +1,8 @@
-﻿:root {
+:root {
+  color-scheme: light;
   --bg: #f4efe6;
   --bg-deep: #e8dcc7;
+  --bg-mid: #efe4d3;
   --paper: rgba(255, 251, 245, 0.94);
   --paper-strong: #fffdf8;
   --ink: #1e1f1c;
@@ -11,10 +13,89 @@
   --accent-soft: rgba(13, 107, 97, 0.12);
   --warn: #aa4d2f;
   --shadow: 0 20px 60px rgba(52, 39, 18, 0.14);
+  --grid-line: rgba(255, 255, 255, 0.15);
+  --hero-blob-a: rgba(13, 107, 97, 0.18);
+  --hero-blob-b: rgba(206, 153, 67, 0.24);
+  --panel-head-bg: linear-gradient(90deg, rgba(13, 107, 97, 0.08), transparent 46%);
+  --group-card-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.75), rgba(255, 250, 242, 0.92));
+  --field-title-color: #221f19;
+  --item-bg: rgba(255, 253, 249, 0.92);
+  --preview-bg: linear-gradient(180deg, rgba(21, 31, 29, 0.98), rgba(16, 24, 23, 0.98)), linear-gradient(135deg, rgba(13, 107, 97, 0.18), transparent 40%);
+  --preview-text: #ebefe8;
+  --preview-border: rgba(255, 255, 255, 0.06);
+  --input-border: rgba(57, 46, 28, 0.16);
+  --ghost-bg: rgba(255, 255, 255, 0.6);
+  --ghost-border: rgba(65, 53, 34, 0.16);
+  --ghost-hover-bg: rgba(255, 255, 255, 0.84);
+  --scrollbar-track: rgba(120, 98, 56, 0.16);
+  --scrollbar-thumb: rgba(13, 107, 97, 0.48);
+  --scrollbar-thumb-hover: rgba(11, 76, 69, 0.74);
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #121617;
+  --bg-deep: #0a0d0e;
+  --bg-mid: #111719;
+  --paper: rgba(20, 26, 28, 0.92);
+  --paper-strong: #182022;
+  --ink: #eef2ef;
+  --muted: #9daaa6;
+  --line: rgba(177, 204, 196, 0.16);
+  --accent: #30b29d;
+  --accent-strong: #97eadc;
+  --accent-soft: rgba(48, 178, 157, 0.16);
+  --warn: #ff8a63;
+  --shadow: 0 20px 60px rgba(0, 0, 0, 0.34);
+  --grid-line: rgba(255, 255, 255, 0.05);
+  --hero-blob-a: rgba(48, 178, 157, 0.18);
+  --hero-blob-b: rgba(226, 157, 81, 0.12);
+  --panel-head-bg: linear-gradient(90deg, rgba(48, 178, 157, 0.1), transparent 46%);
+  --group-card-bg: linear-gradient(180deg, rgba(27, 34, 36, 0.88), rgba(20, 26, 28, 0.96));
+  --field-title-color: #f0f4f1;
+  --item-bg: rgba(23, 30, 32, 0.96);
+  --preview-bg: linear-gradient(180deg, rgba(8, 12, 13, 0.98), rgba(6, 9, 10, 0.98)), linear-gradient(135deg, rgba(48, 178, 157, 0.14), transparent 40%);
+  --preview-text: #f3f6f4;
+  --preview-border: rgba(255, 255, 255, 0.08);
+  --ghost-bg: rgba(11, 16, 17, 0.88);
+  --ghost-border: rgba(162, 196, 187, 0.18);
+  --ghost-hover-bg: rgba(16, 22, 24, 0.96);
+  --input-border: rgba(171, 201, 193, 0.34);
+  --scrollbar-track: rgba(10, 16, 17, 0.88);
+  --scrollbar-thumb: rgba(48, 178, 157, 0.52);
+  --scrollbar-thumb-hover: rgba(111, 232, 210, 0.76);
 }
 
 * {
   box-sizing: border-box;
+}
+
+html,
+body,
+body::before,
+.hero,
+.panel,
+.group-card,
+.group-head,
+.preview-scroll,
+.primary-btn,
+.ghost-btn,
+.mini-btn,
+.theme-icon-btn,
+input[type="text"],
+input[type="number"],
+select,
+.field-title,
+.field-key,
+.panel-head p,
+.group-head p,
+.hero-text {
+  transition:
+    background-color 220ms ease,
+    color 220ms ease,
+    border-color 220ms ease,
+    box-shadow 220ms ease,
+    background 220ms ease;
 }
 
 body {
@@ -25,7 +106,7 @@ body {
   background:
     radial-gradient(circle at top left, rgba(219, 177, 107, 0.24), transparent 28%),
     radial-gradient(circle at top right, rgba(13, 107, 97, 0.18), transparent 24%),
-    linear-gradient(135deg, var(--bg) 0%, #efe4d3 44%, var(--bg-deep) 100%);
+    linear-gradient(135deg, var(--bg) 0%, var(--bg-mid) 44%, var(--bg-deep) 100%);
 }
 
 body::before {
@@ -34,10 +115,10 @@ body::before {
   inset: 0;
   pointer-events: none;
   background-image:
-    linear-gradient(rgba(255,255,255,0.15) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.15) 1px, transparent 1px);
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
   background-size: 28px 28px;
-  mask-image: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.06));
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.06));
 }
 
 .page-shell {
@@ -57,12 +138,53 @@ body::before {
 
 .hero {
   display: grid;
-  grid-template-columns: 1.8fr 1fr;
+  grid-template-columns: minmax(0, 1.8fr) minmax(240px, 332px) auto;
+  grid-template-rows: auto 1fr;
   gap: 24px;
   padding: 28px;
   border-radius: 28px;
   overflow: hidden;
   position: relative;
+  align-items: start;
+}
+
+.theme-toggle {
+  position: relative;
+  grid-column: 3;
+  grid-row: 1 / span 2;
+  justify-self: end;
+  align-self: start;
+  z-index: 2;
+  display: inline-flex;
+  padding: 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.28);
+  backdrop-filter: blur(10px);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+
+.theme-icon-btn {
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1px solid var(--ghost-border);
+  background: var(--ghost-bg);
+  color: var(--ink);
+  font-size: 18px;
+  transition: transform 180ms ease, background-color 220ms ease, border-color 220ms ease, color 220ms ease, box-shadow 220ms ease;
+}
+
+.theme-icon-btn:hover {
+  background: var(--ghost-hover-bg);
+  transform: translateY(-1px);
+}
+
+.theme-icon-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px var(--accent-soft);
 }
 
 .hero::after {
@@ -73,8 +195,15 @@ body::before {
   width: 220px;
   height: 220px;
   border-radius: 30% 70% 70% 30% / 41% 46% 54% 59%;
-  background: linear-gradient(135deg, rgba(13, 107, 97, 0.18), rgba(206, 153, 67, 0.24));
+  background: linear-gradient(135deg, var(--hero-blob-a), var(--hero-blob-b));
   filter: blur(6px);
+}
+
+.hero-copy {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  min-width: 0;
+  padding-right: 8px;
 }
 
 .eyebrow {
@@ -102,10 +231,16 @@ body::before {
 }
 
 .hero-actions {
+  grid-column: 2;
+  grid-row: 1 / span 2;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: stretch;
+  justify-self: stretch;
   gap: 12px;
+  padding-top: 0;
+  padding-right: 6px;
 }
 
 .workspace {
@@ -137,15 +272,37 @@ body::before {
   padding-right: 6px;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+.panel-scroll::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.panel-scroll::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+  border-radius: 999px;
+}
+
+.panel-scroll::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.panel-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+  background-clip: padding-box;
 }
 
 .preview-scroll {
   padding-right: 0;
   border-radius: 18px;
-  background:
-    linear-gradient(180deg, rgba(21, 31, 29, 0.98), rgba(16, 24, 23, 0.98)),
-    linear-gradient(135deg, rgba(13, 107, 97, 0.18), transparent 40%);
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);
+  background: var(--preview-bg);
+  box-shadow: inset 0 0 0 1px var(--preview-border);
 }
 
 .panel-head {
@@ -177,7 +334,7 @@ body::before {
 .group-card {
   border: 1px solid var(--line);
   border-radius: 20px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.75), rgba(255,250,242,0.92));
+  background: var(--group-card-bg);
   overflow: hidden;
 }
 
@@ -189,7 +346,7 @@ body::before {
   gap: 16px;
   padding: 16px 18px 12px;
   border-bottom: 1px solid rgba(65, 53, 34, 0.08);
-  background: linear-gradient(90deg, rgba(13, 107, 97, 0.08), transparent 46%);
+  background: var(--panel-head-bg);
   cursor: pointer;
 }
 
@@ -251,7 +408,7 @@ body::before {
 .field-title {
   font-size: 15px;
   font-weight: 700;
-  color: #221f19;
+  color: var(--field-title-color);
 }
 
 .field-key {
@@ -266,7 +423,7 @@ input[type="text"],
 input[type="number"],
 select {
   width: 100%;
-  border: 1px solid rgba(57, 46, 28, 0.16);
+  border: 1px solid var(--input-border);
   border-radius: 14px;
   padding: 12px 14px;
   color: var(--ink);
@@ -277,6 +434,12 @@ select {
 
 input::placeholder {
   color: #a39a8c;
+}
+
+input:hover,
+select:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-soft);
 }
 
 input:focus,
@@ -308,8 +471,8 @@ button {
 
 .ghost-btn,
 .mini-btn {
-  border: 1px solid rgba(65, 53, 34, 0.16);
-  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid var(--ghost-border);
+  background: var(--ghost-bg);
   color: var(--ink);
 }
 
@@ -321,6 +484,11 @@ button {
 .ghost-btn:hover,
 .mini-btn:hover {
   transform: translateY(-1px);
+}
+
+.ghost-btn:hover,
+.mini-btn:hover {
+  background: var(--ghost-hover-bg);
 }
 
 .list-block,
@@ -336,7 +504,7 @@ button {
   border: 1px solid rgba(65, 53, 34, 0.12);
   border-radius: 18px;
   padding: 14px;
-  background: rgba(255, 253, 249, 0.92);
+  background: var(--item-bg);
 }
 
 .list-item {
@@ -373,7 +541,7 @@ button {
   height: 100%;
   overflow: visible;
   padding: 18px;
-  color: #ebefe8;
+  color: var(--preview-text);
   background: transparent;
   font-family: "IBM Plex Mono", monospace;
   font-size: 13px;
@@ -401,6 +569,27 @@ button {
     border-radius: 22px;
   }
 
+  .theme-toggle {
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: end;
+    align-self: start;
+    gap: 6px;
+    padding: 6px;
+  }
+
+  .theme-icon-btn {
+    width: 34px;
+    height: 34px;
+    font-size: 16px;
+  }
+
+  .hero-copy {
+    grid-column: 1;
+    grid-row: 2;
+    padding-right: 0;
+  }
+
   .hero h1 {
     white-space: normal;
     font-size: clamp(28px, 8.5vw, 42px);
@@ -414,7 +603,12 @@ button {
   }
 
   .hero-actions {
+    grid-column: 1;
+    grid-row: 3;
     gap: 10px;
+    justify-self: stretch;
+    padding-right: 0;
+    padding-top: 0;
   }
 
   .primary-btn,
@@ -486,6 +680,7 @@ button {
 
   .group-body {
     padding: 14px 16px 16px;
+    gap: 12px;
   }
 
   .field-title {
@@ -510,10 +705,6 @@ button {
 
   .field-grid {
     gap: 10px;
-  }
-
-  .group-body {
-    gap: 12px;
   }
 
   .list-item,

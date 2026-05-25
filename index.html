@@ -12,6 +12,11 @@
 <body>
   <div class="page-shell">
     <header class="hero">
+      <div class="theme-toggle">
+        <button id="themeCycleBtn" class="theme-icon-btn" type="button" aria-label="主题模式" title="跟随系统">
+          <span id="themeCycleIcon" aria-hidden="true">🖥</span>
+        </button>
+      </div>
       <div class="hero-copy">
         <p class="eyebrow">EasyTier Config Studio</p>
         <h1>easytier配置生成</h1>
@@ -50,6 +55,7 @@
     </main>
   </div>
 
-  <script src="./app.js"></script>
+  <script type="module" src="./app.js"></script>
 </body>
 </html>
+
