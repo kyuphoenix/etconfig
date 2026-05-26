@@ -98,6 +98,28 @@ select,
     background 220ms ease;
 }
 
+:root.theme-animating body,
+:root.theme-animating body::before,
+:root.theme-animating .hero,
+:root.theme-animating .panel,
+:root.theme-animating .group-card,
+:root.theme-animating .group-head,
+:root.theme-animating .preview-scroll,
+:root.theme-animating .primary-btn,
+:root.theme-animating .ghost-btn,
+:root.theme-animating .mini-btn,
+:root.theme-animating .theme-icon-btn,
+:root.theme-animating input[type="text"],
+:root.theme-animating input[type="number"],
+:root.theme-animating select,
+:root.theme-animating .field-title,
+:root.theme-animating .field-key,
+:root.theme-animating .panel-head p,
+:root.theme-animating .group-head p,
+:root.theme-animating .hero-text {
+  transition: none !important;
+}
+
 body {
   margin: 0;
   min-height: 100vh;
@@ -119,6 +141,22 @@ body::before {
     linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
   background-size: 28px 28px;
   mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.06));
+}
+
+.theme-transition-overlay {
+  position: fixed;
+  z-index: 9999;
+  pointer-events: none;
+  border-radius: 999px;
+  transform: scale(0);
+  opacity: 1;
+  will-change: transform;
+  transition: transform 620ms cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+.theme-transition-overlay.is-active {
+  transform: scale(1);
 }
 
 .page-shell {

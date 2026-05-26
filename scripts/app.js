@@ -12,7 +12,7 @@ import {
   getNextThemeMode,
   getStoredThemeMode,
   THEME_STORAGE_KEY
-} from "./theme/theme.js?v=5";
+} from "./theme/theme.js?v=6";
 import { createTomlBuilder } from "./toml/toml-builder.js";
 import { bindDomHandlers } from "./utils/dom-handlers.js";
 
@@ -26,7 +26,7 @@ const systemThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
 const themeCycleBtn = document.getElementById("themeCycleBtn");
 const themeCycleIcon = document.getElementById("themeCycleIcon");
 const statusController = createStatusController(statusText);
-const { applyTheme } = createThemeController({
+const { applyTheme, animateThemeChange } = createThemeController({
   root: document.documentElement,
   button: themeCycleBtn,
   icon: themeCycleIcon,
@@ -82,6 +82,7 @@ bindDomHandlers({
   getNextThemeMode,
   storageKey: THEME_STORAGE_KEY,
   applyTheme,
+  animateThemeChange,
   getTomlText: () => tomlOutput.textContent,
   onReset: () => {
     resetState();

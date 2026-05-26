@@ -8,6 +8,7 @@ export function bindDomHandlers({
   getNextThemeMode,
   storageKey,
   applyTheme,
+  animateThemeChange,
   getTomlText,
   onReset,
   statusController
@@ -37,7 +38,11 @@ export function bindDomHandlers({
     themeButton.addEventListener("click", () => {
       const nextMode = getNextThemeMode(getStoredThemeMode());
       localStorage.setItem(storageKey, nextMode);
-      applyTheme(nextMode);
+      if (typeof animateThemeChange === "function") {
+        animateThemeChange(nextMode, themeButton);
+      } else {
+        applyTheme(nextMode);
+      }
     });
   }
 

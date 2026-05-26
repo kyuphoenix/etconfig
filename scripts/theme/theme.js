@@ -1,5 +1,9 @@
 ﻿export const THEME_STORAGE_KEY = "etconfig-theme-mode";
 const THEME_MODE_ORDER = ["system", "light", "dark"];
+const THEME_BACKGROUNDS = {
+  light: `radial-gradient(circle at top left, rgba(219, 177, 107, 0.24), transparent 28%), radial-gradient(circle at top right, rgba(13, 107, 97, 0.18), transparent 24%), linear-gradient(135deg, #f4efe6 0%, #efe4d3 44%, #e8dcc7 100%)`,
+  dark: `radial-gradient(circle at top left, rgba(226, 157, 81, 0.12), transparent 28%), radial-gradient(circle at top right, rgba(48, 178, 157, 0.16), transparent 24%), linear-gradient(135deg, #121617 0%, #111719 44%, #0a0d0e 100%)`
+};
 const ICON_MAP = {
   system: `
     <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -76,5 +80,48 @@ export function createThemeController({ root, button, icon, systemThemeQuery }) 
     }
   }
 
-  return { applyTheme, resolveTheme };
+  function animateThemeChange(mode, trigger) {
+    const resolvedTheme = resolveTheme(mode);
+    if (typeof window === "undefined" || typeof document === "undefined") {
+      applyTheme(mode);
+      return;
+    }
+
+    const source = trigger?.getBoundingClientRect?.() || button?.getBoundingClientRect?.();
+    const originX = source ? source.left + source.width / 2 : window.innerWidth - 32;
+    const originY = source ? source.top + source.height / 2 : 32;
+    const radius = Math.hypot(
+      Math.max(originX, window.innerWidth - originX),
+      Math.max(originY, window.innerHeight - originY)
+    );
+
+    const overlay = document.createElement("div");
+    overlay.className = "theme-transition-overlay";
+    overlay.style.left = `${originX - radius}px`;
+    overlay.style.top = `${originY - radius}px`;
+    overlay.style.width = `${radius * 2}px`;
+    overlay.style.height = `${radius * 2}px`;
+    overlay.style.background = THEME_BACKGROUNDS[resolvedTheme];
+
+    root.classList.add("theme-animating");
+    document.body.appendChild(overlay);
+
+    requestAnimationFrame(() => {
+      overlay.classList.add("is-active");
+    });
+
+    window.setTimeout(() => {
+      applyTheme(mode);
+    }, 140);
+
+    const cleanup = () => {
+      overlay.removeEventListener("transitionend", cleanup);
+      overlay.remove();
+      root.classList.remove("theme-animating");
+    };
+
+    overlay.addEventListener("transitionend", cleanup);
+  }
+
+  return { applyTheme, animateThemeChange, resolveTheme };
 }
