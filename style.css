@@ -66,6 +66,20 @@
   --scrollbar-thumb-hover: rgba(111, 232, 210, 0.76);
 }
 
+:root[data-theme-pending="light"] {
+  --pending-paper: rgba(255, 251, 245, 0.94);
+  --pending-line: rgba(65, 53, 34, 0.14);
+  --pending-shadow: 0 20px 60px rgba(52, 39, 18, 0.14);
+  --pending-group-card-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.75), rgba(255, 250, 242, 0.92));
+}
+
+:root[data-theme-pending="dark"] {
+  --pending-paper: rgba(20, 26, 28, 0.92);
+  --pending-line: rgba(177, 204, 196, 0.16);
+  --pending-shadow: 0 20px 60px rgba(0, 0, 0, 0.34);
+  --pending-group-card-bg: linear-gradient(180deg, rgba(27, 34, 36, 0.88), rgba(20, 26, 28, 0.96));
+}
+
 * {
   box-sizing: border-box;
 }
@@ -91,33 +105,11 @@ select,
 .group-head p,
 .hero-text {
   transition:
-    background-color 220ms ease,
-    color 220ms ease,
-    border-color 220ms ease,
-    box-shadow 220ms ease,
-    background 220ms ease;
-}
-
-:root.theme-animating body,
-:root.theme-animating body::before,
-:root.theme-animating .hero,
-:root.theme-animating .panel,
-:root.theme-animating .group-card,
-:root.theme-animating .group-head,
-:root.theme-animating .preview-scroll,
-:root.theme-animating .primary-btn,
-:root.theme-animating .ghost-btn,
-:root.theme-animating .mini-btn,
-:root.theme-animating .theme-icon-btn,
-:root.theme-animating input[type="text"],
-:root.theme-animating input[type="number"],
-:root.theme-animating select,
-:root.theme-animating .field-title,
-:root.theme-animating .field-key,
-:root.theme-animating .panel-head p,
-:root.theme-animating .group-head p,
-:root.theme-animating .hero-text {
-  transition: none !important;
+    background-color 180ms ease,
+    color 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    background 180ms ease;
 }
 
 body {
@@ -135,6 +127,7 @@ body::before {
   content: "";
   position: fixed;
   inset: 0;
+  z-index: 0;
   pointer-events: none;
   background-image:
     linear-gradient(var(--grid-line) 1px, transparent 1px),
@@ -145,18 +138,23 @@ body::before {
 
 .theme-transition-overlay {
   position: fixed;
-  z-index: 9999;
+  inset: 0;
+  z-index: -1;
   pointer-events: none;
-  border-radius: 999px;
-  transform: scale(0);
+  clip-path: circle(0 at var(--theme-origin-x) var(--theme-origin-y));
   opacity: 1;
-  will-change: transform;
-  transition: transform 620ms cubic-bezier(0.22, 1, 0.36, 1);
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06);
+  will-change: clip-path, opacity;
+  transition:
+    clip-path 460ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 180ms ease 180ms;
 }
 
 .theme-transition-overlay.is-active {
-  transform: scale(1);
+  clip-path: circle(var(--theme-radius) at var(--theme-origin-x) var(--theme-origin-y));
+}
+
+.theme-transition-overlay.is-fading {
+  opacity: 0;
 }
 
 .page-shell {
@@ -184,6 +182,67 @@ body::before {
   overflow: hidden;
   position: relative;
   align-items: start;
+}
+
+.hero::before,
+.panel::before,
+.group-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.hero > *,
+.panel > *,
+.group-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.hero::after {
+  z-index: 0;
+}
+
+.panel,
+.group-card {
+  position: relative;
+}
+
+:root.theme-surface-animating .hero::before,
+:root.theme-surface-animating .panel::before,
+:root.theme-surface-animating .group-card::before {
+  opacity: 1;
+  clip-path: circle(0 at var(--theme-local-x) var(--theme-local-y));
+  will-change: clip-path, opacity;
+  transition:
+    clip-path 460ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 180ms ease 180ms;
+}
+
+:root.theme-surface-animating .hero::before,
+:root.theme-surface-animating .panel::before {
+  background: var(--pending-paper);
+  box-shadow: var(--pending-shadow);
+}
+
+:root.theme-surface-animating .group-card::before {
+  background: var(--pending-group-card-bg);
+}
+
+:root.theme-surface-animating .hero,
+:root.theme-surface-animating .panel,
+:root.theme-surface-animating .group-card {
+  border-color: var(--pending-line);
+}
+
+:root.theme-surface-animating .hero::before,
+:root.theme-surface-animating .panel::before,
+:root.theme-surface-animating .group-card::before,
+:root.theme-surface-animating .hero::after {
+  clip-path: circle(var(--theme-radius) at var(--theme-local-x) var(--theme-local-y));
 }
 
 .theme-toggle {

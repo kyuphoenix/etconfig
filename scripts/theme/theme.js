@@ -53,6 +53,13 @@ export function getNextThemeMode(mode) {
 }
 
 export function createThemeController({ root, button, icon, systemThemeQuery }) {
+  let activeOverlay = null;
+  let cleanupTimer = null;
+
+  function getThemedSurfaces() {
+    return Array.from(document.querySelectorAll(".hero, .panel, .group-card"));
+  }
+
   function resolveTheme(mode) {
     if (mode === "light" || mode === "dark") {
       return mode;
@@ -80,9 +87,18 @@ export function createThemeController({ root, button, icon, systemThemeQuery }) 
     }
   }
 
+  function getActiveResolvedTheme() {
+    return root.dataset.theme || resolveTheme(getStoredThemeMode());
+  }
+
   function animateThemeChange(mode, trigger) {
     const resolvedTheme = resolveTheme(mode);
     if (typeof window === "undefined" || typeof document === "undefined") {
+      applyTheme(mode);
+      return;
+    }
+
+    if (getActiveResolvedTheme() === resolvedTheme) {
       applyTheme(mode);
       return;
     }
@@ -94,17 +110,59 @@ export function createThemeController({ root, button, icon, systemThemeQuery }) 
       Math.max(originX, window.innerWidth - originX),
       Math.max(originY, window.innerHeight - originY)
     );
+    const surfaces = getThemedSurfaces();
+
+    if (cleanupTimer) {
+      window.clearTimeout(cleanupTimer);
+      cleanupTimer = null;
+    }
+
+    if (activeOverlay) {
+      activeOverlay.remove();
+      activeOverlay = null;
+    }
 
     const overlay = document.createElement("div");
     overlay.className = "theme-transition-overlay";
-    overlay.style.left = `${originX - radius}px`;
-    overlay.style.top = `${originY - radius}px`;
-    overlay.style.width = `${radius * 2}px`;
-    overlay.style.height = `${radius * 2}px`;
+    overlay.style.setProperty("--theme-origin-x", `${originX}px`);
+    overlay.style.setProperty("--theme-origin-y", `${originY}px`);
+    overlay.style.setProperty("--theme-radius", `${Math.ceil(radius)}px`);
     overlay.style.background = THEME_BACKGROUNDS[resolvedTheme];
 
+    const cleanup = () => {
+      if (cleanupTimer) {
+        window.clearTimeout(cleanupTimer);
+        cleanupTimer = null;
+      }
+      if (activeOverlay === overlay) {
+        activeOverlay = null;
+      }
+      overlay.remove();
+      delete root.dataset.themePending;
+      root.classList.remove("theme-animating");
+      root.classList.remove("theme-surface-animating");
+      for (const surface of surfaces) {
+        surface.style.removeProperty("--theme-local-x");
+        surface.style.removeProperty("--theme-local-y");
+        surface.style.removeProperty("--theme-radius");
+      }
+    };
+
+    root.dataset.themePending = resolvedTheme;
+    for (const surface of surfaces) {
+      const rect = surface.getBoundingClientRect();
+      surface.style.setProperty("--theme-local-x", `${originX - rect.left}px`);
+      surface.style.setProperty("--theme-local-y", `${originY - rect.top}px`);
+      surface.style.setProperty("--theme-radius", `${Math.ceil(radius)}px`);
+    }
+
+    activeOverlay = overlay;
     root.classList.add("theme-animating");
+    root.classList.add("theme-surface-animating");
     document.body.appendChild(overlay);
+
+    // Force layout before enabling the transition so the clip-path animates reliably.
+    overlay.getBoundingClientRect();
 
     requestAnimationFrame(() => {
       overlay.classList.add("is-active");
@@ -112,15 +170,18 @@ export function createThemeController({ root, button, icon, systemThemeQuery }) 
 
     window.setTimeout(() => {
       applyTheme(mode);
-    }, 140);
+      if (activeOverlay === overlay) {
+        overlay.classList.add("is-fading");
+      }
+    }, 180);
 
-    const cleanup = () => {
-      overlay.removeEventListener("transitionend", cleanup);
-      overlay.remove();
-      root.classList.remove("theme-animating");
-    };
+    overlay.addEventListener("transitionend", (event) => {
+      if (event.propertyName === "opacity") {
+        cleanup();
+      }
+    });
 
-    overlay.addEventListener("transitionend", cleanup);
+    cleanupTimer = window.setTimeout(cleanup, 640);
   }
 
   return { applyTheme, animateThemeChange, resolveTheme };
