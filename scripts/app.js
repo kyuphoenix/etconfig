@@ -3,18 +3,18 @@ import {
   DEFAULT_STATE,
   GROUPS,
   PROTOCOL_OPTIONS
-} from "./config-data.js";
-import { bindDomHandlers } from "./dom-handlers.js";
-import { createFormRenderer } from "./form-renderer.js";
-import { createStateController } from "./state-controller.js";
+} from "./data/config-data.js";
+import { createFormRenderer } from "./form/form-renderer.js";
+import { createStateController } from "./state/state-controller.js";
+import { createStatusController } from "./state/ui-status.js";
 import {
   createThemeController,
   getNextThemeMode,
   getStoredThemeMode,
   THEME_STORAGE_KEY
-} from "./theme.js";
-import { createTomlBuilder } from "./toml-builder.js";
-import { createStatusController } from "./ui-status.js";
+} from "./theme/theme.js";
+import { createTomlBuilder } from "./toml/toml-builder.js";
+import { bindDomHandlers } from "./utils/dom-handlers.js";
 
 const formRoot = document.getElementById("formRoot");
 const tomlOutput = document.getElementById("tomlOutput");
@@ -38,8 +38,6 @@ const stateController = createStateController({
 });
 const {
   getState,
-  getByPath,
-  setByPath,
   getEffectiveInstanceId,
   resetState,
   groupOpenState

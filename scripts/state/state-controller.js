@@ -1,4 +1,4 @@
-import { getByPath, setByPath } from "./path-utils.js";
+import { getByPath, setByPath } from "../utils/path-utils.js";
 
 export function createStateController({ defaultState, groups }) {
   let state = structuredClone(defaultState);
