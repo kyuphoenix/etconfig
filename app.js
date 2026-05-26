@@ -4,6 +4,7 @@ import {
   GROUPS,
   PROTOCOL_OPTIONS
 } from "./config-data.js";
+import { bindDomHandlers } from "./dom-handlers.js";
 import { createFormRenderer } from "./form-renderer.js";
 import { createStateController } from "./state-controller.js";
 import {
@@ -13,13 +14,18 @@ import {
   THEME_STORAGE_KEY
 } from "./theme.js";
 import { createTomlBuilder } from "./toml-builder.js";
+import { createStatusController } from "./ui-status.js";
 
 const formRoot = document.getElementById("formRoot");
 const tomlOutput = document.getElementById("tomlOutput");
 const statusText = document.getElementById("statusText");
+const copyTomlBtn = document.getElementById("copyTomlBtn");
+const downloadTomlBtn = document.getElementById("downloadTomlBtn");
+const resetBtn = document.getElementById("resetBtn");
 const systemThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
 const themeCycleBtn = document.getElementById("themeCycleBtn");
 const themeCycleIcon = document.getElementById("themeCycleIcon");
+const statusController = createStatusController(statusText);
 const { applyTheme } = createThemeController({
   root: document.documentElement,
   button: themeCycleBtn,
@@ -49,7 +55,7 @@ function renderToml() {
   const toml = tomlBuilder.buildToml();
   tomlOutput.textContent = toml;
   const lineCount = toml.split("\n").filter(Boolean).length;
-  statusText.textContent = `已生成 ${lineCount} 行`;
+  statusController.setGeneratedLines(lineCount);
 }
 
 function rerender() {
@@ -59,55 +65,32 @@ function rerender() {
 
 const formRenderer = createFormRenderer({
   formRoot,
-  getByPath,
   getEffectiveInstanceId,
   getState,
   groupOpenState,
   groups: GROUPS,
   protocolOptions: PROTOCOL_OPTIONS,
   renderToml,
-  rerender,
-  setByPath
+  rerender
 });
 
-document.getElementById("copyTomlBtn").addEventListener("click", async () => {
-  const text = tomlOutput.textContent;
-  await navigator.clipboard.writeText(text);
-  statusText.textContent = "已复制到剪贴板";
+bindDomHandlers({
+  copyButton: copyTomlBtn,
+  downloadButton: downloadTomlBtn,
+  resetButton: resetBtn,
+  themeButton: themeCycleBtn,
+  systemThemeQuery,
+  getStoredThemeMode,
+  getNextThemeMode,
+  storageKey: THEME_STORAGE_KEY,
+  applyTheme,
+  getTomlText: () => tomlOutput.textContent,
+  onReset: () => {
+    resetState();
+    rerender();
+  },
+  statusController
 });
-
-document.getElementById("downloadTomlBtn").addEventListener("click", () => {
-  const blob = new Blob([tomlOutput.textContent], { type: "text/plain;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = "config.toml";
-  link.click();
-  URL.revokeObjectURL(url);
-  statusText.textContent = "已下载 config.toml";
-});
-
-document.getElementById("resetBtn").addEventListener("click", () => {
-  resetState();
-  rerender();
-  statusText.textContent = "已清空为安全默认状态";
-});
-
-if (themeCycleBtn) {
-  themeCycleBtn.addEventListener("click", () => {
-    const nextMode = getNextThemeMode(getStoredThemeMode());
-    localStorage.setItem(THEME_STORAGE_KEY, nextMode);
-    applyTheme(nextMode);
-  });
-}
-
-if (systemThemeQuery && typeof systemThemeQuery.addEventListener === "function") {
-  systemThemeQuery.addEventListener("change", () => {
-    if (getStoredThemeMode() === "system") {
-      applyTheme("system");
-    }
-  });
-}
 
 applyTheme(getStoredThemeMode());
 rerender();

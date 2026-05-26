@@ -1,3 +1,5 @@
+import { getByPath, setByPath } from "./path-utils.js";
+
 export function createStateController({ defaultState, groups }) {
   let state = structuredClone(defaultState);
   let generatedInstanceId = crypto.randomUUID();
@@ -7,22 +9,6 @@ export function createStateController({ defaultState, groups }) {
 
   function getState() {
     return state;
-  }
-
-  function getByPath(object, path) {
-    return path.split(".").reduce((current, key) => current?.[key], object);
-  }
-
-  function setByPath(object, path, value) {
-    const keys = path.split(".");
-    const lastKey = keys.pop();
-    const target = keys.reduce((current, key) => {
-      if (!(key in current)) {
-        current[key] = {};
-      }
-      return current[key];
-    }, object);
-    target[lastKey] = value;
   }
 
   function getEffectiveInstanceId() {

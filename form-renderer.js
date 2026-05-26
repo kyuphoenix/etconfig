@@ -1,14 +1,14 @@
+import { getByPath, setByPath } from "./path-utils.js";
+
 export function createFormRenderer({
   formRoot,
-  getByPath,
   getEffectiveInstanceId,
   getState,
   groupOpenState,
   groups,
   protocolOptions,
   renderToml,
-  rerender,
-  setByPath
+  rerender
 }) {
   function createMetaText(className, text) {
     const node = document.createElement("div");
