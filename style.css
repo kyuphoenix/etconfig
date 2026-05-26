@@ -156,35 +156,73 @@ body::before {
   align-self: start;
   z-index: 2;
   display: inline-flex;
-  padding: 8px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.28);
-  backdrop-filter: blur(10px);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+  padding: 0;
 }
 
 .theme-icon-btn {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 999px;
-  border: 1px solid var(--ghost-border);
-  background: var(--ghost-bg);
-  color: var(--ink);
+  padding: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--muted);
   font-size: 18px;
-  transition: transform 180ms ease, background-color 220ms ease, border-color 220ms ease, color 220ms ease, box-shadow 220ms ease;
+  box-shadow: none;
+  transition: color 220ms ease, background-color 220ms ease, transform 180ms ease, box-shadow 220ms ease;
+}
+
+.theme-icon {
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 18px;
+  aspect-ratio: 1 / 1;
+  min-width: 18px;
+  min-height: 18px;
+  overflow: visible;
+}
+
+.theme-icon svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+  flex: 0 0 18px;
+  aspect-ratio: 1 / 1;
+  min-width: 18px;
+  min-height: 18px;
+  overflow: visible;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .theme-icon-btn:hover {
-  background: var(--ghost-hover-bg);
+  color: var(--accent-strong);
+  background: rgba(255, 255, 255, 0.06);
   transform: translateY(-1px);
 }
 
 .theme-icon-btn:focus-visible {
   outline: none;
   box-shadow: 0 0 0 4px var(--accent-soft);
+}
+
+:root[data-theme="dark"] .theme-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+:root[data-theme="light"] .theme-icon-btn:hover {
+  background: rgba(30, 31, 28, 0.05);
 }
 
 .hero::after {
@@ -574,14 +612,34 @@ button {
     grid-row: 1;
     justify-self: end;
     align-self: start;
-    gap: 6px;
-    padding: 6px;
+    gap: 0;
+    padding: 0;
   }
 
   .theme-icon-btn {
-    width: 34px;
-    height: 34px;
+    width: 42px;
+    height: 42px;
     font-size: 16px;
+  }
+
+  .theme-icon,
+  .theme-icon svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .theme-icon {
+    flex-basis: 16px;
+    aspect-ratio: 1 / 1;
+    min-width: 16px;
+    min-height: 16px;
+  }
+
+  .theme-icon svg {
+    flex-basis: 16px;
+    aspect-ratio: 1 / 1;
+    min-width: 16px;
+    min-height: 16px;
   }
 
   .hero-copy {
