@@ -6,7 +6,7 @@ import {
 } from "./data/config-data.js";
 import { createFormRenderer } from "./form/form-renderer.js";
 import { createStateController } from "./state/state-controller.js";
-import { createStatusController } from "./state/ui-status.js";
+import { createStatusController } from "./state/ui-status.js?v=3";
 import {
   createThemeController,
   getNextThemeMode,
@@ -14,12 +14,13 @@ import {
   THEME_STORAGE_KEY
 } from "./theme/theme.js?v=6";
 import { createTomlBuilder } from "./toml/toml-builder.js";
-import { bindDomHandlers } from "./utils/dom-handlers.js";
+import { bindDomHandlers } from "./utils/dom-handlers.js?v=3";
 
 const formRoot = document.getElementById("formRoot");
 const tomlOutput = document.getElementById("tomlOutput");
 const statusText = document.getElementById("statusText");
 const copyTomlBtn = document.getElementById("copyTomlBtn");
+const copyTomlMobileBtn = document.getElementById("copyTomlMobileBtn");
 const downloadTomlBtn = document.getElementById("downloadTomlBtn");
 const resetBtn = document.getElementById("resetBtn");
 const systemThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
@@ -74,6 +75,7 @@ const formRenderer = createFormRenderer({
 
 bindDomHandlers({
   copyButton: copyTomlBtn,
+  mobileCopyButton: copyTomlMobileBtn,
   downloadButton: downloadTomlBtn,
   resetButton: resetBtn,
   themeButton: themeCycleBtn,

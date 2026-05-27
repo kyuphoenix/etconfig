@@ -1,5 +1,6 @@
 export function bindDomHandlers({
   copyButton,
+  mobileCopyButton,
   downloadButton,
   resetButton,
   themeButton,
@@ -13,10 +14,63 @@ export function bindDomHandlers({
   onReset,
   statusController
 }) {
-  copyButton.addEventListener("click", async () => {
-    await navigator.clipboard.writeText(getTomlText());
-    statusController.setCopied();
-  });
+  function fallbackCopyText(text) {
+    try {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.setAttribute("readonly", "true");
+      textarea.style.position = "fixed";
+      textarea.style.top = "-9999px";
+      textarea.style.left = "-9999px";
+      document.body.appendChild(textarea);
+      textarea.select();
+      textarea.setSelectionRange(0, textarea.value.length);
+      const copied = typeof document.execCommand === "function" ? document.execCommand("copy") : false;
+      textarea.remove();
+      return copied;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  async function copyText(text) {
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        try {
+          await navigator.clipboard.writeText(text);
+          return true;
+        } catch (error) {
+          // Fall back to selection-based copy for restrictive mobile browsers.
+        }
+      }
+
+      return fallbackCopyText(text);
+    } catch (error) {
+      return false;
+    }
+  }
+
+  const handleCopy = async () => {
+    statusController.setCopying();
+
+    try {
+      const copied = await copyText(getTomlText());
+      if (copied) {
+        statusController.setCopied();
+        return;
+      }
+    } catch (error) {
+      // Fall through to the visible failure state below.
+    }
+
+    statusController.setCopyFailed();
+  };
+
+  copyButton.addEventListener("click", handleCopy);
+
+  if (mobileCopyButton) {
+    mobileCopyButton.addEventListener("click", handleCopy);
+  }
 
   downloadButton.addEventListener("click", () => {
     const blob = new Blob([getTomlText()], { type: "text/plain;charset=utf-8" });
