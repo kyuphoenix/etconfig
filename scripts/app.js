@@ -10,7 +10,7 @@ import {
   getNextThemeMode,
   getStoredThemeMode,
   THEME_STORAGE_KEY
-} from "./theme/theme.js?v=6";
+} from "./theme/theme.js?v=7";
 import { createTomlBuilder } from "./toml/toml-builder.js";
 import { bindDomHandlers } from "./utils/dom-handlers.js?v=3";
 

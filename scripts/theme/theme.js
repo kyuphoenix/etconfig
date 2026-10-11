@@ -1,4 +1,4 @@
-﻿export const THEME_STORAGE_KEY = "etconfig-theme-mode";
+export const THEME_STORAGE_KEY = "etconfig-theme-mode";
 const THEME_MODE_ORDER = ["system", "light", "dark"];
 const THEME_BACKGROUNDS = {
   light: `radial-gradient(circle at top left, rgba(219, 177, 107, 0.24), transparent 28%), radial-gradient(circle at top right, rgba(13, 107, 97, 0.18), transparent 24%), linear-gradient(135deg, #f4efe6 0%, #efe4d3 44%, #e8dcc7 100%)`,
@@ -54,11 +54,8 @@ export function getNextThemeMode(mode) {
 
 export function createThemeController({ root, button, icon, systemThemeQuery }) {
   let activeOverlay = null;
+  let activeViewTransition = null;
   let cleanupTimer = null;
-
-  function getThemedSurfaces() {
-    return Array.from(document.querySelectorAll(".hero, .panel, .group-card"));
-  }
 
   function resolveTheme(mode) {
     if (mode === "light" || mode === "dark") {
@@ -98,7 +95,13 @@ export function createThemeController({ root, button, icon, systemThemeQuery }) 
       return;
     }
 
-    if (getActiveResolvedTheme() === resolvedTheme) {
+    const previousTheme = getActiveResolvedTheme();
+    if (previousTheme === resolvedTheme) {
+      applyTheme(mode);
+      return;
+    }
+
+    if ( window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ) {
       applyTheme(mode);
       return;
     }
@@ -110,7 +113,6 @@ export function createThemeController({ root, button, icon, systemThemeQuery }) 
       Math.max(originX, window.innerWidth - originX),
       Math.max(originY, window.innerHeight - originY)
     );
-    const surfaces = getThemedSurfaces();
 
     if (cleanupTimer) {
       window.clearTimeout(cleanupTimer);
@@ -122,12 +124,49 @@ export function createThemeController({ root, button, icon, systemThemeQuery }) 
       activeOverlay = null;
     }
 
+    if (typeof document.startViewTransition === "function") {
+      if (activeViewTransition) {
+        try {
+          activeViewTransition.skipTransition();
+        } catch {
+          // Ignore skip errors on already finished transitions.
+        }
+        activeViewTransition = null;
+      }
+
+      root.style.setProperty("--theme-origin-x", `${Math.round(originX)}px`);
+      root.style.setProperty("--theme-origin-y", `${Math.round(originY)}px`);
+      root.style.setProperty("--theme-radius", `${Math.ceil(radius)}px`);
+      root.classList.add("theme-animating");
+
+      try {
+        const transition = document.startViewTransition(() => {
+          applyTheme(mode);
+        });
+        activeViewTransition = transition;
+        transition.finished
+          .catch(() => {})
+          .finally(() => {
+            if (activeViewTransition === transition) {
+              activeViewTransition = null;
+              root.classList.remove("theme-animating");
+              root.style.removeProperty("--theme-origin-x");
+              root.style.removeProperty("--theme-origin-y");
+              root.style.removeProperty("--theme-radius");
+            }
+          });
+        return;
+      } catch {
+        root.classList.remove("theme-animating");
+        applyTheme(mode);
+        return;
+      }
+    }
+
+    // Lightweight GPU-composited opacity fallback for browsers without View Transitions API
     const overlay = document.createElement("div");
     overlay.className = "theme-transition-overlay";
-    overlay.style.setProperty("--theme-origin-x", `${originX}px`);
-    overlay.style.setProperty("--theme-origin-y", `${originY}px`);
-    overlay.style.setProperty("--theme-radius", `${Math.ceil(radius)}px`);
-    overlay.style.background = THEME_BACKGROUNDS[resolvedTheme];
+    overlay.style.background = THEME_BACKGROUNDS[previousTheme] || THEME_BACKGROUNDS.light;
 
     const cleanup = () => {
       if (cleanupTimer) {
@@ -138,50 +177,21 @@ export function createThemeController({ root, button, icon, systemThemeQuery }) 
         activeOverlay = null;
       }
       overlay.remove();
-      delete root.dataset.themePending;
       root.classList.remove("theme-animating");
-      root.classList.remove("theme-surface-animating");
-      for (const surface of surfaces) {
-        surface.style.removeProperty("--theme-local-x");
-        surface.style.removeProperty("--theme-local-y");
-        surface.style.removeProperty("--theme-radius");
-      }
     };
-
-    root.dataset.themePending = resolvedTheme;
-    for (const surface of surfaces) {
-      const rect = surface.getBoundingClientRect();
-      surface.style.setProperty("--theme-local-x", `${originX - rect.left}px`);
-      surface.style.setProperty("--theme-local-y", `${originY - rect.top}px`);
-      surface.style.setProperty("--theme-radius", `${Math.ceil(radius)}px`);
-    }
 
     activeOverlay = overlay;
     root.classList.add("theme-animating");
-    root.classList.add("theme-surface-animating");
     document.body.appendChild(overlay);
+    applyTheme(mode);
 
-    // Force layout before enabling the transition so the clip-path animates reliably.
     overlay.getBoundingClientRect();
-
     requestAnimationFrame(() => {
-      overlay.classList.add("is-active");
+      overlay.classList.add("is-fading");
     });
 
-    window.setTimeout(() => {
-      applyTheme(mode);
-      if (activeOverlay === overlay) {
-        overlay.classList.add("is-fading");
-      }
-    }, 180);
-
-    overlay.addEventListener("transitionend", (event) => {
-      if (event.propertyName === "opacity") {
-        cleanup();
-      }
-    });
-
-    cleanupTimer = window.setTimeout(cleanup, 640);
+    overlay.addEventListener("transitionend", cleanup, { once: true });
+    cleanupTimer = window.setTimeout(cleanup, 260);
   }
 
   return { applyTheme, animateThemeChange, resolveTheme };
