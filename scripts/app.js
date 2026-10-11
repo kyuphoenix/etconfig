@@ -1,8 +1,6 @@
 import {
-  DATA_COMPRESS_ALGO_MAP,
   DEFAULT_STATE,
-  GROUPS,
-  PROTOCOL_OPTIONS
+  GROUPS
 } from "./data/config-data.js";
 import { createFormRenderer } from "./form/form-renderer.js";
 import { createStateController } from "./state/state-controller.js";
@@ -45,7 +43,6 @@ const {
 } = stateController;
 
 const tomlBuilder = createTomlBuilder({
-  dataCompressAlgoMap: DATA_COMPRESS_ALGO_MAP,
   getEffectiveInstanceId,
   getState
 });
@@ -68,7 +65,6 @@ const formRenderer = createFormRenderer({
   getState,
   groupOpenState,
   groups: GROUPS,
-  protocolOptions: PROTOCOL_OPTIONS,
   renderToml,
   rerender
 });
